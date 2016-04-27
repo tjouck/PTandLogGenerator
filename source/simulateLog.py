@@ -16,10 +16,11 @@ OUTPUT:
 
 import sys
 sys.path.insert(0, '../newick')
+sys.path.insert(0, '../simpy')
 from tree import TreeNode
 import random
-from simpy import Environment
-from simpy.events import AllOf, AnyOf, NOf, Zombie
+from core import Environment
+from events import AllOf, AnyOf, NOf, Zombie
 
 
 class Case():
