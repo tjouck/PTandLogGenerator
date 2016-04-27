@@ -1,0 +1,2 @@
+mode;min;max;sequence;choice;parallel;loop;or;silent;duplicate;lt_dependency;infrequent;no_models
+30;10;50;0.2;0.2;0.2;0.2;0.2;0.2;0;0.0;False;10
