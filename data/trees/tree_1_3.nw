@@ -1,1 +1,0 @@
-(((e:1,u:1)or:1,a:1,r:1)parallel:1,((b:0.5,tau:0.5)choice:1,((c:1,((i:1,(p:0.5,w:0.5)choice:1)sequence:0.5,((k:1,s:1)parallel:1,o:1)sequence:0.5)choice:1)parallel:1,((f:0.5,q:0.5)choice:1,(g:1,l:1)sequence:1,(h:1,((j:1,v:1)sequence:0.5,tau:0.5)choice:1)parallel:1)loop:1)sequence:1,((d:1,t:1)or:1,m:1,n:1)loop:1)loop:1)sequence:1;
