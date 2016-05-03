@@ -6,7 +6,7 @@ import types
 from heapq import heappush, heappop
 from itertools import count
 
-from simpy.events import (AllOf, AnyOf, Event, Process, Timeout, URGENT,
+from events import (AllOf, AnyOf, Event, Process, Timeout, URGENT,
                           NORMAL)
 
 
