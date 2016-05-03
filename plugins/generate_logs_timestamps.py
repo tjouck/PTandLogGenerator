@@ -18,6 +18,8 @@ OUTPUT:
 import glob
 import sys
 sys.path.insert(0, '../newick')
+sys.path.insert(0, '../source')
+sys.path.insert(0, '../simpy')
 from tree import TreeNode
 from simulateLog import LogSimulator
 

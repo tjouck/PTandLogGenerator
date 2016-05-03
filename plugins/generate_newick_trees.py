@@ -14,6 +14,10 @@ INPUT: csv-file
 OUTPUT:
     newick tree files (*.nw)
 """
+import sys
+sys.path.insert(0, '../newick/')
+sys.path.insert(0, '../simpy/')
+sys.path.insert(0, '../source/')
 
 from generateTree import RandomTree
 from convert_to_ptml import PtmlConverter

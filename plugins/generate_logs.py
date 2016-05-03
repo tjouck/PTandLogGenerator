@@ -17,7 +17,9 @@ OUTPUT:
 
 import glob
 import sys
-sys.path.insert(0, '../newick')
+sys.path.insert(0, '../newick/')
+sys.path.insert(0, '../simpy/')
+sys.path.insert(0, '../source/')
 from tree import TreeNode
 from simulateLog import LogSimulator
 from add_noise import NoiseGenerator
