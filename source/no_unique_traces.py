@@ -64,7 +64,6 @@ def loop(paths,iterations):
     repeat = [(0,1)]
     xor_set = repeat
     for i in range(iterations):
-        sequence(repeat,redo)
         repeat = sequence(sequence(repeat,redo),do)
         xor_set = choice(xor_set,repeat)
     results = sequence(sequence(do,xor_set),exit_)
@@ -75,21 +74,23 @@ def or_(paths):
     for i in range(1,len(paths)+1):
         for c in itertools.combinations(paths,i):
             if len(list(c)) < 2:
-                results.append(c[0][0])
+                for (z_i, x_i) in c[0]:
+                    results.append((z_i, x_i))
             else:
                 r = c[0]
                 for i in range(1,len(c)):
                     r = parallel(r,c[i])
-                results.append(r[0])
+                for (z_i, x_i) in r:
+                    results.append((z_i, x_i))
     return results
 
 def numberOfPaths(node,paths,k):
     if (node.is_leaf()):
         if node.name == "tau":
-            print node.name, [(0,1)]
+            #print node.name, [(0,1)]
             return [(0,1)]
         else:
-            print node.name, [(1,1)]
+            #print node.name, [(1,1)]
             return [(1,1)]
 
     else:
@@ -100,55 +101,44 @@ def numberOfPaths(node,paths,k):
             results = paths[0]
             for i in range(1,len(node.get_children())):
                 results = sequence(results,paths[i])
-            print node.name, simplify(results)
+            #print node.name, simplify(results)
             return simplify(results)
 
         elif node.name == "choice":
             results = paths[0]
             for i in range(1,len(node.get_children())):
                 results = choice(results,paths[i])
-            print node.name, simplify(results)
+            #print node.name, simplify(results)
             return simplify(results)
 
         elif node.name == "parallel":
             results = paths[0]
             for i in range(1,len(node.get_children())):
                 results = parallel(results,paths[i])
-            print node.name, simplify(results)
+            #print node.name, simplify(results)
             return simplify(results)
 
         elif node.name == "loop":
             results = loop(paths,k)
-            print node.name, simplify(results)
+            #print node.name, simplify(results)
             return simplify(results)
 
         elif node.name == "or":
             results = or_(paths)
-            print node.name, simplify(results)
+            #print node.name, simplify(results)
             return simplify(results)
 
 def sumOfPaths(paths):
     total_paths = 0
     for (z_i, x_i) in paths:
         total_paths += x_i
-    return int(total_paths)
+    return total_paths
 
 
 class NoUniqueTraces:
     def __init__(self,tree_string,loop_iterations):
         t = TreeNode(tree_string,format = 1)
         print t.get_ascii(show_internal=True, compact=False)
-
         paths = []
-
         paths = numberOfPaths(t.get_tree_root(),paths,loop_iterations)
-
         self.no_unique_traces = sumOfPaths(paths)
-
-n = NoUniqueTraces("(a:1,((b:1,((d:1,f:1)sequence:1,(e:1,g:1)sequence:1)parallel:1)sequence:1,c:1)parallel:1,h:1)sequence:1;",2)
-print "number of unique traces:", n.no_unique_traces
-
-#"((a:1,b:1,c:1)loop:1,d:1)choice:1;"
-#"((a:1,b:1)sequence:1,c:1,d:1)choice:1;"
-#"((a:1,tau:1)choice:1,(b:1,c:1,(((d:1,(f:1,i:1)choice:1)sequence:1,(e:1,g:1)parallel:1)or:1,h:1)sequence:1)loop:1)parallel:1;"
-#"(a:1,(b:1,c:1)parallel:1,((d:1,f:1)sequence:1,(e:1,g:1)sequence:1)parallel:1,h:1)sequence:1;"
