@@ -4,17 +4,17 @@ Created on Tue Mar 08 20:09:31 2016
 
 @author: lucp8356
 
-This plugin reads a csv-file with population parameters used to
-generate a collection of trees.
+This plugin generates a collection of trees from a specified population.
 
-INPUT: csv-file
-    One row is one population:
+INPUT: parameterfile (csv-formatted)
+    Each row is one population:
     mode;min;max;sequence;choice;parallel;loop;or;silent;duplicate;lt_dependency;infrequent;no_models
 
 OUTPUT:
     newick tree files (*.nw)
 """
 import sys
+import argparse
 sys.path.insert(0, '../newick/')
 sys.path.insert(0, '../simpy/')
 sys.path.insert(0, '../source/')
@@ -23,10 +23,21 @@ from generateTree import RandomTree
 from convert_to_ptml import PtmlConverter
 from tree_to_graphviz import GraphvizTree
 
-#open the csv-file with population parameters
-parameter_lines = open("../data/parameter_files/example_parameters.csv")
+
+parser = argparse.ArgumentParser(description='Generate process trees from input population.')
+parser.add_argument('-i', help='give the csv-formatted file in which the' \
+                     ' population parameters are specified, example: ' \
+                     '../data/parameter_files/example_parameters.csv',
+                     metavar='input_file')
+
+args = parser.parse_args()
+print "start of plugin with arguments: ", args
+
+parameter_lines = ''
 first_line = True
 population_index = 1
+
+parameter_lines = open(args.i)
 
 #for each population generate trees
 for line in parameter_lines:
