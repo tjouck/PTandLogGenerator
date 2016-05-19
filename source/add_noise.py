@@ -21,7 +21,7 @@ class NoiseGenerator():
         traces = dict()
         for line in log:
             if line.startswith("case_id"):
-                print line
+                #print line
                 continue
             line = line.strip()
             contents = line.split(",")
@@ -31,48 +31,48 @@ class NoiseGenerator():
     #work with traces as lists: <y,z,aa> => ["y","z","aa"]!
 
     def remove_task(self,trace):
-        print "remove task"
-        print "old trace:", trace
+        #print "remove task"
+        #print "old trace:", trace
         act = random.choice(trace)
         trace.remove(act)
-        print "new trace:", trace
+        #print "new trace:", trace
         return trace
 
     def swap_tasks(self,trace):
-        print "swap tasks"
-        print "old trace:", trace
+        #print "swap tasks"
+        #print "old trace:", trace
         act_1 = random.choice(trace)
         act_2 = act_1
         while act_2 == act_1:
             act_2 = random.choice(trace)
         a, b = trace.index(act_1), trace.index(act_2)
         trace[a], trace[b] = trace[b], trace[a]
-        print "new trace:", trace
+        #print "new trace:", trace
         return trace
 
     def remove_head(self,trace):
-        print "remove head"
-        print "old trace:", trace
+        #print "remove head"
+        #print "old trace:", trace
         end_index = len(trace)/3
         trace = trace[end_index:]
-        print "new trace:", trace
+        #print "new trace:", trace
         return trace
 
     def remove_body(self,trace):
-        print "remove body"
-        print "old trace:", trace
+        #print "remove body"
+        #print "old trace:", trace
         start_index = len(trace)/3
         end_index = (2*len(trace))/3
         trace = trace[:start_index] + trace[end_index:]
-        print "new trace:", trace
+        #print "new trace:", trace
         return trace
 
     def remove_tail(self,trace):
-        print "remove tail"
-        print "old trace:", trace
+        #print "remove tail"
+        #print "old trace:", trace
         start_index = (2*len(trace))/3
         trace = trace[:start_index]
-        print "new trace:", trace
+        #print "new trace:", trace
         return trace
 
     def add_noise(self,noise_prob, traces):
@@ -89,7 +89,7 @@ class NoiseGenerator():
                     x = random.random()
                     key = int(x * len(traces))
                     trace = traces[key]
-                print key
+                #print key
                 #to implement a mix all noise, randomly choose a noise type
                 noise_type = random.choice(["swap","remove","head","body","tail"])
                 if noise_type == "swap":
