@@ -16,9 +16,15 @@ Process tree generator
     * process tree markup language (*.ptml)
     * image file (*.png)
   
-  * Usage: callable from command line:
-    * call plugin: $python generate_newick_tree.py -i <paramter_file>
-    * help: $python generate_newick_tree.py -h prints help
+  * Usage: callable from command line:  
+    $python generate_newick_trees.py [-h] [-i input_file]
+    
+    Generate process trees from input population.
+    
+    optional arguments:  
+    -h, --help :     show this help message and exit  
+    -i input_file  give the csv-formatted file in which the population  
+    parameters are specified, example: ../data/parameter_files/example_parameters.csv
   
 Log simulator
 -------------
@@ -31,15 +37,16 @@ Log simulator
 
   * Output: event log in csv-file format 'case_id', 'act_name'[,'start_time','end_time']
 
-  * Usage: callable from command line
-    * call plugin: $python generate_logs.py [-h] [--i [input_folder]] [--t [timestamps]] size noise  
-      Simulate event logs from process trees.  
+  * Usage: callable from command line  
+    call plugin: $python generate_logs.py [-h] [--i [input_folder]] [--t [timestamps]] size noise
+    
+    Simulate event logs from process trees.  
       
-      positional arguments:  
-      size                number of traces to simulate  
-      noise               probability to insert noise into trace
+    positional arguments:  
+    size:                number of traces to simulate  
+    noise:               probability to insert noise into trace
       
-      optional arguments:  
-      -h, --help          show this help message and exit  
-      --i [input_folder]  specify the relative address to the trees folder, default=../data/trees/  
-      --t [timestamps]    indicate whether to include timestamps or not, default=False  
+    optional arguments:  
+    -h, --help :          show this help message and exit  
+    --i [input_folder] : specify the relative address to the trees folder, default=../data/trees/  
+    --t [timestamps] :   indicate whether to include timestamps or not, default=False  
