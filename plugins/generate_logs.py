@@ -66,15 +66,22 @@ for filepath in tree_files:
     #write log to csv-file
     tree_index = filepath[filepath.find('_'):filepath.rfind('.nw')]
     csv_file = open("../data/logs/log" + tree_index + ".csv", 'w')
-    csv_file.write("case_id,act_name,start_time,end_time\n")
+    if record_timestamps:
+        csv_file.write("traceid,activity,start_time,end_time\n")
+    else:
+        csv_file.write("traceid,activity\n")
     trace_id = 0
     for trace in traces:
         trace_id += 1
         for event in trace:
-            activity = event[0]
-            start_time = event[1]
-            end_time = event[2]
-            csv_file.write(str(trace_id) + "," + activity + "," +
-            str(start_time) + "," + str(end_time) + "\n")
+            if record_timestamps:
+                activity = event[0]
+                start_time = event[1]
+                end_time = event[2]
+                csv_file.write(str(trace_id) + "," + activity + "," +
+                str(start_time) + "," + str(end_time) + "\n")
+            else:
+                activity = event[0]
+                csv_file.write(str(trace_id) + "," + activity + "\n")
 
     csv_file.close()

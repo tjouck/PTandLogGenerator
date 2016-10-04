@@ -19,6 +19,7 @@ sys.path.insert(0, '../newick')
 sys.path.insert(0, '../simpy')
 from tree import TreeNode
 import random
+import datetime
 from core import Environment
 from events import AllOf, AnyOf, NOf, Zombie
 
@@ -41,6 +42,7 @@ class LogSimulator():
         self.record_timestamps = record_timestamps
         self.log = Log()
         self.env = Environment()
+        self.start_date = datetime.datetime.today()
         self.create_bpsim()
 
         for i in range(no_cases):
@@ -279,14 +281,14 @@ class LogSimulator():
                     req = res.request()
                     print("%d: request resource '%s' @%s" % (eid, res_name, env.now))
                     yield req
-                start_time = env.now
+                start_time = self.add_sec(self.start_date,env.now)
                 #print("%d: start activity '%s' @%s" % (eid, act_name, env.now))
                 yield env.timeout(fdur())
-                end_time = env.now
+                end_time = self.add_sec(self.start_date,env.now)
                 #print("%d: end activity '%s' @%s" % (eid, act_name, env.now))
                 if act_name != "tau":
                     if self.record_timestamps:
-                        case.trace.append((act_name, start_time, end_time))
+                        case.trace.append((act_name, start_time.isoformat(), end_time.isoformat()))
                     else:
                         case.trace.append(act_name)
                     #+ "," + str(start_time) + "," + str(end_time) + "\n")
@@ -597,6 +599,10 @@ class LogSimulator():
         def fdur():
             return random.randint(1,10000)
         return fdur
+        
+    def add_sec(self,time,secs):
+        time = time + datetime.timedelta(seconds=secs)
+        return time
 
     def run(self):
         global env
