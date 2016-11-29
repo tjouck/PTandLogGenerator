@@ -18,10 +18,8 @@ import string
 import itertools
 import random
 import math
-import sys
-sys.path.insert(0, '../newick')
-from tree import TreeNode
-from add_lt_dependencies_class import Lt_dependency
+from ete2 import Tree
+from add_random_dependencies_tree import Lt_dependency
 import scipy.stats as stats
 
 class RandomTree():
@@ -36,7 +34,7 @@ class RandomTree():
         min_act = float (parameters[1])
         max_act = float (parameters[2])
 
-        #define the probabilities for each of the patterns to include
+        # 1) define the probabilities for each of the patterns to include
 
         self.O = ["sequence","choice","parallel","loop","or"]
         self.pattern_probabilities = []
@@ -66,35 +64,36 @@ class RandomTree():
         self.prob_lt_dependencies = float(parameters[10])
 
         #infrequent paths?
-        self.infrequent_paths = parameters[11]
+        self.infrequent_paths = float(parameters[11])
 
-        #initialize tree object
-        self.t = TreeNode()
-
+        # 2) initialize tree object
+        self.t = Tree()
+        
+        # 3) create random tree from population
         self.t = self.create_tree()
+        
+        # 4) add execution priorities to choices
+        self.add_execution_priorities()
 
-        #add lt-dependencies
+        # 5) add lt-dependencies to tree
         if self.prob_lt_dependencies > 0:
             tree_with_lt_dep = Lt_dependency(self.t, self.prob_lt_dependencies)
-            added_lt_dependencies = tree_with_lt_dep.possible
-            while not added_lt_dependencies:
+            possible_to_add = tree_with_lt_dep.dependencies_possible
+            while not possible_to_add:
                 #print "GENERATE NEW TREE"
                 tree_with_lt_dep = Lt_dependency(self.create_tree(), self.prob_lt_dependencies)
-                added_lt_dependencies = tree_with_lt_dep.possible
+                possible_to_add = tree_with_lt_dep.dependencies_possible
 
-            self.t = tree_with_lt_dep.t
+            self.t = tree_with_lt_dep.canonical_tree
 
-            #reduce tree again
+            #reduce tree again (is this needed: YES!)
             self.reduce_tree()
-
-        #add execution priorities to choices
-        self.add_execution_priorities()
 
     ##################################################
     ##################################################
 
     def create_tree(self):
-        self.t = TreeNode()
+        self.t = Tree()
         #generate necessary number of activity labels
         alphabet = string.lowercase
         no_act_labels = 0
@@ -364,12 +363,8 @@ class RandomTree():
 
     def add_execution_priorities(self):
         for node in self.t.traverse(strategy = "preorder"):
-            if node.name == "choice" and self.infrequent_paths == "False":
-                children = node.get_children()
-                for child in children:
-                    prob = 1.0/len(children)
-                    child.dist = prob
-            elif node.name == "choice" and self.infrequent_paths == "True":
+            x = random.random()
+            if node.name == "choice" and self.infrequent_paths < x:
                 children = node.get_children()
                 dominant_child = random.choice(children)
                 dominant_child.dist = 0.9
@@ -377,6 +372,12 @@ class RandomTree():
                 for child in children:
                     prob = 0.1/len(children)
                     child.dist = prob
+                
+            elif node.name == "choice" and self.infrequent_paths >= x:
+                children = node.get_children()
+                for child in children:
+                    prob = 1.0/len(children)
+                    child.dist = prob   
 
     def check_dupl_poss(self):
         possible = False
