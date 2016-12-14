@@ -362,9 +362,9 @@ class RandomTree():
                 task.name = duplicate.name
 
     def add_execution_priorities(self):
-        for node in self.t.traverse(strategy = "preorder"):
+        for node in self.t.search_nodes(name='choice'):
             x = random.random()
-            if node.name == "choice" and self.infrequent_paths < x:
+            if x < self.infrequent_paths:
                 children = node.get_children()
                 dominant_child = random.choice(children)
                 dominant_child.dist = 0.9
@@ -373,11 +373,11 @@ class RandomTree():
                     prob = 0.1/len(children)
                     child.dist = prob
                 
-            elif node.name == "choice" and self.infrequent_paths >= x:
+            elif x >= self.infrequent_paths:
                 children = node.get_children()
                 for child in children:
                     prob = 1.0/len(children)
-                    child.dist = prob   
+                    child.dist = prob
 
     def check_dupl_poss(self):
         possible = False

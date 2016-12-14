@@ -64,3 +64,5 @@ for line in parameter_lines:
         graphiv_converter = GraphvizTree(random_tree.t.write(format=1,format_root_node=True), population_index, i)
         #print random_tree.t.get_ascii()
     population_index += 1
+    
+    timing.endlog()
