@@ -22,6 +22,7 @@ sys.path.insert(0, '../source/')
 from generateTree import RandomTree
 from convert_to_ptml import PtmlConverter
 from tree_to_graphviz import GraphvizTree
+import timing
 
 
 parser = argparse.ArgumentParser(description='Generate process trees from input population.')
@@ -61,5 +62,5 @@ for line in parameter_lines:
         converter = PtmlConverter(tree_name,random_tree.t.write(format=1,format_root_node=True))
         #print tree to graphiv image file
         graphiv_converter = GraphvizTree(random_tree.t.write(format=1,format_root_node=True), population_index, i)
-        print random_tree.t.get_ascii()
+        #print random_tree.t.get_ascii()
     population_index += 1

@@ -539,9 +539,10 @@ def randomly_select_rules(rules,rules_dictionary,lt_probability,sequences_dict,c
                     eliminated_rules.append(rule)
             else:
                 pass
+    '''
     print "INSERTED RULES:"
     for r in inserted_rules:
-        _print_rule(r)
+        _print_rule(r)'''
     
     """SUPERFLUOUS
     print "FINAL DECISION TABLES:"
@@ -682,7 +683,7 @@ class Lt_dependency():
     
             self.sequences = return_sequences(self.precedences)
             #print "SEQUENCES (Sx):"
-            _print_sequences(self.sequences)
+            #_print_sequences(self.sequences)
     
         #3) Construct all possible dependency rules
     
