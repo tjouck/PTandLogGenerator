@@ -13,6 +13,7 @@ class NoiseGenerator():
 
     def __init__(self,traces,noise_percentage):
         self.resulting_traces = []
+        self.no_noisy_traces = 0
         self.resulting_traces = self.add_noise(noise_percentage,traces)
 
     #read csv log-file
@@ -21,7 +22,7 @@ class NoiseGenerator():
         traces = dict()
         for line in log:
             if line.startswith("case_id"):
-                #print line
+                print line
                 continue
             line = line.strip()
             contents = line.split(",")
@@ -43,12 +44,17 @@ class NoiseGenerator():
         #print "old trace:", trace
         act_1 = random.choice(trace)
         act_2 = act_1
-        while act_2 == act_1:
+        count = 0
+        while act_2 == act_1 and count <10:
             act_2 = random.choice(trace)
-        a, b = trace.index(act_1), trace.index(act_2)
-        trace[a], trace[b] = trace[b], trace[a]
-        #print "new trace:", trace
-        return trace
+            count += 1
+        if count < 10:
+            a, b = trace.index(act_1), trace.index(act_2)
+            trace[a], trace[b] = trace[b], trace[a]
+            #print "new trace:", trace
+            return trace,True
+        else:
+            return trace,False
 
     def remove_head(self,trace):
         #print "remove head"
@@ -76,33 +82,44 @@ class NoiseGenerator():
         return trace
 
     def add_noise(self,noise_prob, traces):
-        for i in range(len(traces)):
+        new_traces = []
+        for trace in traces:
+            #if the trace contains only one activity, continue
+            if len(trace) <= 1:
+                new_traces.append(trace)
+                continue
             #draw a random number x
             x = random.random()
             #if x is smaller than the noise_prob, add noise
             if x < noise_prob:
-                #use x to select a random trace
-                key = int(x * len(traces))
-                trace = traces[key]
-                #if the trace contains only one activity, select another trace
-                while len(trace) <= 1:
-                    x = random.random()
-                    key = int(x * len(traces))
-                    trace = traces[key]
-                #print key
+                self.no_noisy_traces += 1
                 #to implement a mix all noise, randomly choose a noise type
                 noise_type = random.choice(["swap","remove","head","body","tail"])
                 if noise_type == "swap":
-                    traces[key] = self.swap_tasks(trace)
+                    trace, added = self.swap_tasks(trace)
+                    if added == True:
+                        new_traces.append(trace)
+                    else:
+                        noise_type = random.choice(["remove","head","body","tail"])
+                        if noise_type == "remove":
+                            new_traces.append(self.remove_task(trace))
+                        elif noise_type == "head":
+                            new_traces.append(self.remove_head(trace))
+                        elif noise_type == "body":
+                            new_traces.append(self.remove_body(trace))
+                        elif noise_type == "tail":
+                            new_traces.append(self.remove_tail(trace))
                 elif noise_type == "remove":
-                    traces[key] = self.remove_task(trace)
+                    new_traces.append(self.remove_task(trace))
                 elif noise_type == "head":
-                    traces[key] = self.remove_head(trace)
+                    new_traces.append(self.remove_head(trace))
                 elif noise_type == "body":
-                    traces[key] = self.remove_body(trace)
+                    new_traces.append(self.remove_body(trace))
                 elif noise_type == "tail":
-                    traces[key] = self.remove_tail(trace)
-        return traces
+                    new_traces.append(self.remove_tail(trace))
+            else:
+                new_traces.append(trace)
+        return new_traces
 
     def noisy_traces_to_csv(self,fname, traces):
         output = open(fname + "_noise.csv", 'w')
@@ -112,37 +129,3 @@ class NoiseGenerator():
                 output.write(str(eid) + "," + activity + "\n")
 
         output.close()
-
-"""
-#################################################################
-#ask user to provide the name of the log input file
-fname = "plugins/Logs/_10_1.csv"
-
-def get_traces(fname):
-        log = open(fname)
-        traces = dict()
-        for line in log:
-            if line.startswith("case_id"):
-                print line
-                continue
-            line = line.strip()
-            contents = line.split(",")
-            traces.setdefault(contents[0],[]).append(contents[1])
-        return traces
-
-#ask user for percentage of noise in log
-noise_percentage = 0.1
-
-#insert noise into traces
-dict_traces = get_traces(fname)
-traces = []
-for eid,trace in dict_traces.iteritems():
-    traces.append(trace)
-generator = NoiseGenerator(traces, noise_percentage)
-noisy_traces = generator.resulting_traces
-
-#print noisy traces
-
-for trace in noisy_traces:
-    print trace
-"""
