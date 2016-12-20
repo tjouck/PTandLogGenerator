@@ -91,4 +91,8 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# trees and logs
+data/trees/*
+data/logs/*.csv
+
 
