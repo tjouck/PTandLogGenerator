@@ -23,9 +23,11 @@ sys.path.insert(0, '../simpy/')
 sys.path.insert(0, '../source/')
 from tree import TreeNode
 from simulateLog import LogSimulator
+from simulateTrace import TraceSimulator
 from add_noise import NoiseGenerator
 import xml.etree.ElementTree as xmltree
 import timing
+import random
 
 def write_as_csv(traces,tree_index,record_timestamps):
     '''writes log to a csv-formatted file:
@@ -133,6 +135,24 @@ def write_as_xes(traces,tree_index,record_timestamps):
         i += 1
     xes_file.write(xmltree.tostring(root))
     xes_file.close()
+    
+def select_child(children):
+    x = random.random()
+    cutoffs = []
+    previous_cutoff = 0
+
+    for i in range(len(children) - 1):
+        cutoffs.append(previous_cutoff + children[i].dist)
+        previous_cutoff = previous_cutoff + children[i].dist
+
+    j = len(cutoffs)
+    for i in range(len(cutoffs)):
+        if x < cutoffs[i]:
+            j = i
+            break
+    return children[j]
+    
+
 
 parser = argparse.ArgumentParser(description='Simulate event logs from process trees.')
 parser.add_argument('--i', nargs='?', default='../data/trees/',
@@ -171,6 +191,27 @@ for filepath in tree_files:
     t = TreeNode(filepath,format=1)
     simulator = LogSimulator(t.write(format=1,format_root_node=True),no_cases, record_timestamps)
     traces = simulator.returnLog()
+    
+    #generate traces
+    t = TreeNode(filepath,format=1)
+    if t.get_tree_root().name == 'choice':
+        traces = []
+        children = t.get_children()
+        for i in range(no_cases):
+            child = select_child(children)
+            if child.is_leaf():
+                artificial_parent = TreeNode('sequence:1;')
+                artificial_parent.add_child(child=child)
+                simulator = TraceSimulator(artificial_parent.write(format=1,format_root_node=True),
+                                           record_timestamps)
+            else:
+                simulator = TraceSimulator(child.write(format=1,format_root_node=True),
+                                           record_timestamps)
+            
+            traces.append(simulator.case.trace)
+    else:
+        simulator = LogSimulator(t.write(format=1,format_root_node=True),no_cases, record_timestamps)
+        traces = simulator.returnLog()
 
     #add noise
     noise_generator = NoiseGenerator(traces, noise_probability)
