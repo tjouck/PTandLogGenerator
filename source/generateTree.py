@@ -20,13 +20,14 @@ import random
 import math
 from ete2 import Tree
 from add_random_dependencies_tree import Lt_dependency
+from add_naive_dependencies import Lt_dependency_naive
 import scipy.stats as stats
 
 class RandomTree():
 
     #initialize population parameters
 
-    def __init__(self, parameterLine):
+    def __init__(self, parameterLine, use_rules):
         self.parameterLine = parameterLine
         parameterLine = parameterLine.rstrip()
         parameters = parameterLine.split(';')
@@ -65,6 +66,15 @@ class RandomTree():
 
         #infrequent paths?
         self.infrequent_paths = float(parameters[11])
+        
+        #unfold loops?
+        self.unfold_loops = int(parameters[13])
+        
+        if self.unfold_loops == 1:
+            #max number of iterations
+            self.max_loop_iterations = int(parameters[14])
+        else:
+            self.max_loop_iterations = 0
 
         # 2) initialize tree object
         self.t = Tree()
@@ -77,14 +87,25 @@ class RandomTree():
 
         # 5) add lt-dependencies to tree
         if self.prob_lt_dependencies > 0:
-            tree_with_lt_dep = Lt_dependency(self.t, self.prob_lt_dependencies)
-            possible_to_add = tree_with_lt_dep.dependencies_possible
-            while not possible_to_add:
-                #print "GENERATE NEW TREE"
-                tree_with_lt_dep = Lt_dependency(self.create_tree(), self.prob_lt_dependencies)
+            #use naive method or rules?
+            if use_rules == False:
+                tree_with_lt_dep = Lt_dependency_naive(self.t, self.prob_lt_dependencies, self.unfold_loops,
+                                             self.max_loop_iterations)
                 possible_to_add = tree_with_lt_dep.dependencies_possible
-
-            self.t = tree_with_lt_dep.canonical_tree
+                while not possible_to_add:
+                    tree_with_lt_dep = Lt_dependency_naive(self.create_tree(), self.prob_lt_dependencies, 
+                                                     self.unfold_loops, self.max_loop_iterations)
+                    possible_to_add = tree_with_lt_dep.dependencies_possible
+    
+                self.t = tree_with_lt_dep.canonical_tree
+            else:
+                tree_with_lt_dep = Lt_dependency(self.t, self.prob_lt_dependencies)
+                possible_to_add = tree_with_lt_dep.dependencies_possible
+                while not possible_to_add:
+                    tree_with_lt_dep = Lt_dependency(self.create_tree(), self.prob_lt_dependencies)
+                    possible_to_add = tree_with_lt_dep.dependencies_possible
+    
+                self.t = tree_with_lt_dep.canonical_tree
 
             #reduce tree again (is this needed: YES!)
             self.reduce_tree()
