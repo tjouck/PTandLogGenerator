@@ -94,5 +94,6 @@ ENV/
 # trees and logs
 data/trees/*
 data/logs/*.csv
+data/logs/*.xes
 
 
