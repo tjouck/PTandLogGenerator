@@ -19,8 +19,10 @@ class GraphvizTree():
         #print t.get_ascii(show_internal=True, compact=False)
 
         dot = graphviz.Graph(format="png")
+        dot.graph_attr.update({'fontname':'sans-serif','ranksep':'0.5','nodesep':'0.1'})
+        dot.node_attr.update({'fontname':'sans-serif','fontsize':'20','fixedsize':'True'})
+        dot.edge_attr.update({'fontname':'sans-serif'})
         branches = []
-        #counter = 1
 
         for node in t.traverse("preorder"):
                 new_id = str(uuid.uuid4())
@@ -31,14 +33,13 @@ class GraphvizTree():
                     if operator_type == "sequence":
                         operator_type = "&#8594;"
                     elif operator_type == "loop":
-                        operator_type = "lo"
+                        operator_type = "&#x21BA;"
                     elif operator_type == "choice":
                         operator_type = "x"
-                        #counter += 1
                     elif operator_type == "parallel":
-                        operator_type = "&#652;"
+                        operator_type = "&#8743;"
                     elif operator_type == "or":
-                        operator_type = "v"
+                        operator_type = "&#8744;"
 
                     dot.node(new_id,label=operator_type,shape="circle")
 
@@ -59,14 +60,13 @@ class GraphvizTree():
                     if operator_type == "sequence":
                         operator_type = "&#8594;"
                     elif operator_type == "loop":
-                        operator_type = "lo"
+                        operator_type = "&#x21BA;"
                     elif operator_type == "choice":
                         operator_type = "x"
-                        #counter += 1
                     elif operator_type == "parallel":
-                        operator_type = "&#652;"
+                        operator_type = "&#8743;"
                     elif operator_type == "or":
-                        operator_type = "v"
+                        operator_type = "&#8744;"
 
                     dot.node(new_id,label=operator_type,shape="circle")
 
