@@ -3,7 +3,7 @@ Process tree and log generator
 
 Provides scripts to generate random process trees and simulate these trees into event logs.
 
-Detailed information on the workings of the generator and simulator can be found in the paper: "Generating Artificial Data for Empirical Analysis of Process Discovery Algorithms: a Process Tree and Log Generator" in Zotero.
+Detailed information on the workings of the generator and simulator can be found in the paper: "Generating Artificial Data for Empirical Analysis of Process Discovery Algorithms: a Process Tree and Log Generator".
 
 Process tree generator
 ----------------------
@@ -43,8 +43,8 @@ Process tree generator
     -h, --help :     show this help message and exit  
     -i input_file  give the csv-formatted file in which the population  
     parameters are specified, example: ../data/parameter_files/example_parameters.csv
-    --m indicate whether to work with long-term dependencies as rules, default=False
-    --g indicate whether to render graphviz image of tree, default=False
+    --m indicate whether to work with long-term dependencies as rules, default=False  
+    --g indicate whether to render graphviz image of tree, default=False  
 	
   
 Log simulator
@@ -70,5 +70,5 @@ Log simulator
     optional arguments:  
     -h, --help :          show this help message and exit  
     --i [input_folder] : specify the relative address to the trees folder, default=../data/trees/  
-    --t [timestamps] :   indicate whether to include timestamps or not, default=False
-    --f [format] : indicate which format to use for the log: xes or csv, default=xes
+    --t [timestamps] :   indicate whether to include timestamps or not, default=False  
+    --f [format] : indicate which format to use for the log: xes or csv, default=xes  
