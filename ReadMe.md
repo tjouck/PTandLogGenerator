@@ -56,7 +56,7 @@ Log simulator
     * noise: the probability of inserting noise
     * timestamps: include timestamps (start and end for each activity?)
 
-  * Output: event log in csv-file format 'case_id', 'act_name'[,'start_time','end_time']
+  * Output: event log in XES format (default) or csv-file format 'case_id', 'act_name'[,'start_time','end_time']
 
   * Usage: callable from command line  
     call plugin: $python generate_logs.py [-h] [--i [input_folder]] [--t [timestamps]] [--f [format]] size noise
