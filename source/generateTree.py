@@ -14,11 +14,13 @@ added to the final tree (after it is reduced).
 
 """
 
+import sys
+sys.path.insert(0, '../newick')
+from tree import TreeNode
 import string
 import itertools
 import random
 import math
-from ete2 import Tree
 from add_random_dependencies_tree import Lt_dependency
 from add_naive_dependencies import Lt_dependency_naive
 import scipy.stats as stats
@@ -77,7 +79,7 @@ class RandomTree():
             self.max_loop_iterations = 0
 
         # 2) initialize tree object
-        self.t = Tree()
+        self.t = TreeNode()
         
         # 3) create random tree from population
         self.t = self.create_tree()
@@ -114,7 +116,7 @@ class RandomTree():
     ##################################################
 
     def create_tree(self):
-        self.t = Tree()
+        self.t = TreeNode()
         #generate necessary number of activity labels
         alphabet = string.lowercase
         no_act_labels = 0
