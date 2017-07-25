@@ -187,10 +187,6 @@ tree_files = glob.glob(tree_folder + "*.nw")
 
 #for each tree
 for filepath in tree_files:
-    #generate traces
-    t = TreeNode(filepath,format=1)
-    simulator = LogSimulator(t.write(format=1,format_root_node=True),no_cases, record_timestamps)
-    traces = simulator.returnLog()
     
     #generate traces
     t = TreeNode(filepath,format=1)
