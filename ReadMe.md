@@ -3,7 +3,8 @@ Process tree and log generator
 
 Provides scripts to generate random process trees and simulate these trees into event logs.
 
-Detailed information on the workings of the generator and simulator can be found in the paper: "Generating Artificial Data for Empirical Analysis of Process Discovery Algorithms: a Process Tree and Log Generator".
+Detailed information on the workings of the generator and simulator can be found in the paper: Jouck, Toon, and Benoît Depaire. “PTandLogGenerator: A Generator for Artificial Event Data.” In Proceedings of the BPM Demo Track 2016 (BPMD 2016), 1789:23–27. Rio de Janeiro: CEUR workshop proceedings, 2016. http://ceur-ws.org/Vol-1789/.
+
 
 Process tree generator
 ----------------------
