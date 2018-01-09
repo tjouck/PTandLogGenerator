@@ -248,6 +248,12 @@ class Lt_dependency_naive():
             #check if the tree contains loop nodes
             
             loop_nodes = self.canonical_tree.search_nodes(name='loop')
+
+            # check if the root node is a loop node
+            if not loop_nodes:
+                loop_is_root = False
+            else:
+                loop_is_root = loop_nodes[0].is_root()
             
             #if the root node is a choice and all other choices are stuck under a loop
             if len(loop_nodes)>0 and choice_under_loop(self.canonical_tree):
@@ -265,13 +271,20 @@ class Lt_dependency_naive():
                         loop_nodes = return_loops_with_choices(self.canonical_tree.search_nodes(name='loop'))
                 
             #2) remove random subtrees of the root node
-            add_id_to_subtrees(self.canonical_tree.get_children())
-            self.no_subtrees = len(self.canonical_tree.get_children())
-            for n in self.canonical_tree.get_children():
-                x = random.random()
-                if x < self.lt_probability and pruning_mechanism(self.canonical_tree,n):
-                    self.no_removed_subtrees += 1
-                    n.detach()
-                    
-            #Normalize branch probabilities of canonical tree
-            recompute_branch_probabilities(self.canonical_tree)
+            # handle special case where the loop is the root node
+            if loop_is_root and self.unfold == 0:
+                # removing children of choices under the loop not correct as it is comparable
+                # to directly unfolding choices under loops (without unfolding loops first)
+                self.no_subtrees = 0
+                self.no_removed_subtrees = 0
+            else:
+                add_id_to_subtrees(self.canonical_tree.get_children())
+                self.no_subtrees = len(self.canonical_tree.get_children())
+                for n in self.canonical_tree.get_children():
+                    x = random.random()
+                    if x < self.lt_probability and pruning_mechanism(self.canonical_tree, n):
+                        self.no_removed_subtrees += 1
+                        n.detach()
+
+                # Normalize branch probabilities of canonical tree
+                recompute_branch_probabilities(self.canonical_tree)
