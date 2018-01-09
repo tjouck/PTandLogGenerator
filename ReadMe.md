@@ -36,15 +36,16 @@ Process tree generator
     * (optional) image file (*.png)
   
   * Usage: callable from command line:  
-    $python generate_newick_trees.py [-h] [-i input_file] [--m [rules]] [--g [graphviz]]
+    $python generate_newick_trees.py [-h] [input input_file] [--t [timeout]] [--g [graphviz]]
     
     Generate process trees from input population.
     
+    positional arguments:  
+    input: input csv-formatted file in which the population parameters are specified, example: ../data/parameter_files/example_parameters.csv
+    
     optional arguments:  
     -h, --help :     show this help message and exit  
-    -i input_file  give the csv-formatted file in which the population  
-    parameters are specified, example: ../data/parameter_files/example_parameters.csv
-    --m indicate whether to work with long-term dependencies as rules, default=False  
+    --t abort tree generation after timeout seconds, default=10000  
     --g indicate whether to render graphviz image of tree, default=False  
 	
   

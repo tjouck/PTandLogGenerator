@@ -69,7 +69,7 @@ def abortable_generate_tree(*args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate process trees from input population.')
-    parser.add_argument('-i', help='give the csv-formatted file in which the' \
+    parser.add_argument('input', help='give the csv-formatted file in which the' \
                                    ' population parameters are specified, example: ' \
                                    '../data/parameter_files/example_parameters.csv',
                         metavar='input_file')
@@ -87,7 +87,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
     first_line = True
-    parameter_lines = open(args.i)
+    parameter_lines = open(args.input)
     population_index = 1
     timeout = args.t
     render_image = args.g
