@@ -36,7 +36,7 @@ Process tree generator
     * (optional) image file (*.png)
   
   * Usage: callable from command line:  
-    $python generate_newick_trees.py [-h] [input input_file] [--t [timeout]] [--g [graphviz]]
+    $python generate_newick_trees.py [-h] [--t [timeout]] [--g [graphviz]] input
     
     Generate process trees from input population.
     
