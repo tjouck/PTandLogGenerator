@@ -9,7 +9,7 @@ This plugin generates a collection of trees from a specified population.
 INPUT: parameterfile (csv-formatted)
     Each row is one population:
     mode;min;max;sequence;choice;parallel;loop;or;silent;duplicate;lt_dependency;infrequent;no_models;unfold;max_repeat
-    
+
     -mode: most frequent number of visible activities
     -min: minimum number of visible activities
     -max: maximum number of visible activities
@@ -40,56 +40,78 @@ sys.path.insert(0, '../source/')
 from generateTree import RandomTree
 from convert_to_ptml import PtmlConverter
 from tree_to_graphviz import GraphvizTree
-import timing
+import multiprocessing
+from multiprocessing.dummy import Pool as ThreadPool
+import time
 
+def generate_tree(parameter_line,i,pop_index,render):
+    random_tree = RandomTree(parameter_line)
+    # print to newick tree file in folder Trees
+    tree_name = "../data/trees/tree_" + str(pop_index) + "_" + str(i)
+    fname = tree_name + ".nw"
+    random_tree.t.write(format=1, outfile=fname, format_root_node=True)
+    converter = PtmlConverter(tree_name, random_tree.t.write(format=1, format_root_node=True))
+    if render == True:
+        graphiv_converter = GraphvizTree(random_tree.t.write(format=1, format_root_node=True), pop_index, i)
+    return 1
 
-parser = argparse.ArgumentParser(description='Generate process trees from input population.')
-parser.add_argument('-i', help='give the csv-formatted file in which the' \
-                     ' population parameters are specified, example: ' \
-                     '../data/parameter_files/example_parameters.csv',
-                     metavar='input_file')
-parser.add_argument('--m', nargs='?', default=False, type=bool,
-                    help='indicate whether to work with long-term dependencies as rules, '\
-                    'default=False', metavar='rules', choices=[False,True])
+def abortable_generate_tree(*args):
+    '''Calls the generate tree function. It aborts tree generation after TIMEOUT seconds.'''
+    p = ThreadPool(1)
+    res = p.apply_async(generate_tree, args=args[:-1])
+    try:
+        out = res.get(args[-1])  # Wait timeout seconds for func to complete.
+        return out
+    except multiprocessing.TimeoutError:
+        print 'aborted: tree_' + str(args[2]) + '_' + str(args[1]) + ';' + str(args[-1])
+        p.terminate()
+        return 0
 
-parser.add_argument('--g', nargs='?', default=False, type=bool,
-                    help='indicate whether to render graphviz image of tree, '\
-                    'default=False', metavar='graphviz', choices=[False,True])
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Generate process trees from input population.')
+    parser.add_argument('-i', help='give the csv-formatted file in which the' \
+                                   ' population parameters are specified, example: ' \
+                                   '../data/parameter_files/example_parameters.csv',
+                        metavar='input_file')
 
-args = parser.parse_args()
-print "start of plugin with arguments: ", args
+    parser.add_argument('--t', nargs='?', default=10000, type=int,
+                        help='give the timeout for aborting tree generation in seconds, ' \
+                             'default=10000', metavar='timeout')
 
-parameter_lines = ''
-first_line = True
-population_index = 1
+    parser.add_argument('--g', nargs='?', default=False, type=bool,
+                        help='indicate whether to render graphviz image of tree, ' \
+                             'default=False', metavar='graphviz', choices=[False, True])
 
-use_rules = args.m
-render_image = args.g
-parameter_lines = open(args.i)
+    args = parser.parse_args()
+    print "start of plugin with arguments: ", args
 
-#for each population generate trees
-for line in parameter_lines:
-    if first_line:
-        first_line = False
-        continue
-    else:
-        line = line.rstrip()
-        parameters = line.split(';')
+    start_time = time.time()
+    first_line = True
+    parameter_lines = open(args.i)
+    population_index = 1
+    timeout = args.t
+    render_image = args.g
 
-    no_trees = int(parameters[12])
+    for line in parameter_lines:
+        if first_line:
+            first_line = False
+            continue
+        else:
+            line = line.rstrip()
+            parameters = line.split(';')
 
-    #generate no_trees trees
-    for i in range(1,no_trees + 1):
-        random_tree = RandomTree(line,use_rules)
-        #print to newick tree file in folder Trees
-        tree_name = "../data/trees/tree_" + str(population_index) + "_" + str(i)
-        fname = tree_name + ".nw"
-        random_tree.t.write(format=1, outfile=fname, format_root_node=True)
-        #print to ptml file in folder Trees
-        converter = PtmlConverter(tree_name,random_tree.t.write(format=1,format_root_node=True))
-        #print tree to graphiv image file
-        if render_image == True:
-            graphiv_converter = GraphvizTree(random_tree.t.write(format=1,format_root_node=True), population_index, i)
-    population_index += 1
-    
-    timing.endlog()
+        no_trees = int(parameters[12])
+
+        pool = multiprocessing.Pool(processes=4)
+        multiple_results = [pool.apply_async(abortable_generate_tree, args=(line, i,
+                                                                            population_index,
+                                                                            render_image,
+                                                                            timeout)) for i in
+                            xrange(1, no_trees + 1)]
+        print 'generated',sum([res.get() for res in multiple_results]), 'models for population' ,str(population_index)
+
+        population_index += 1
+
+    # print total generation time
+    total_time = str(time.time()-start_time)
+    print 'total tree generation time:', total_time

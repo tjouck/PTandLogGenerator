@@ -29,7 +29,7 @@ class RandomTree():
 
     #initialize population parameters
 
-    def __init__(self, parameterLine, use_rules):
+    def __init__(self, parameterLine):
         self.parameterLine = parameterLine
         parameterLine = parameterLine.rstrip()
         parameters = parameterLine.split(';')
@@ -90,25 +90,15 @@ class RandomTree():
         # 5) add lt-dependencies to tree
         if self.prob_lt_dependencies > 0:
             #use naive method or rules?
-            if use_rules == False:
-                tree_with_lt_dep = Lt_dependency_naive(self.t, self.prob_lt_dependencies, self.unfold_loops,
-                                             self.max_loop_iterations)
+            tree_with_lt_dep = Lt_dependency_naive(self.t, self.prob_lt_dependencies, self.unfold_loops,
+                                         self.max_loop_iterations)
+            possible_to_add = tree_with_lt_dep.dependencies_possible
+            while not possible_to_add:
+                tree_with_lt_dep = Lt_dependency_naive(self.create_tree(), self.prob_lt_dependencies,
+                                                 self.unfold_loops, self.max_loop_iterations)
                 possible_to_add = tree_with_lt_dep.dependencies_possible
-                while not possible_to_add:
-                    tree_with_lt_dep = Lt_dependency_naive(self.create_tree(), self.prob_lt_dependencies, 
-                                                     self.unfold_loops, self.max_loop_iterations)
-                    possible_to_add = tree_with_lt_dep.dependencies_possible
-    
-                self.t = tree_with_lt_dep.canonical_tree
-            else:
-                tree_with_lt_dep = Lt_dependency(self.t, self.prob_lt_dependencies)
-                possible_to_add = tree_with_lt_dep.dependencies_possible
-                while not possible_to_add:
-                    tree_with_lt_dep = Lt_dependency(self.create_tree(), self.prob_lt_dependencies)
-                    possible_to_add = tree_with_lt_dep.dependencies_possible
-    
-                self.t = tree_with_lt_dep.canonical_tree
 
+            self.t = tree_with_lt_dep.canonical_tree
             #reduce tree again (is this needed: YES!)
             self.reduce_tree()
 
