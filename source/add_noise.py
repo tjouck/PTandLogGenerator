@@ -31,17 +31,18 @@ class NoiseGenerator():
 
     #work with traces as lists: <y,z,aa> => ["y","z","aa"]!
 
+    #not used in mixed noise type
     def remove_task(self,trace):
-        #print "remove task"
-        #print "old trace:", trace
         act = random.choice(trace)
         trace.remove(act)
-        #print "new trace:", trace
+        return trace
+
+    def duplicate_task(self,trace):
+        random_index = random.randrange(0,len(trace))
+        trace.insert(random_index+1,trace[random_index])
         return trace
 
     def swap_tasks(self,trace):
-        #print "swap tasks"
-        #print "old trace:", trace
         act_1 = random.choice(trace)
         act_2 = act_1
         count = 0
@@ -51,34 +52,24 @@ class NoiseGenerator():
         if count < 10:
             a, b = trace.index(act_1), trace.index(act_2)
             trace[a], trace[b] = trace[b], trace[a]
-            #print "new trace:", trace
             return trace,True
         else:
             return trace,False
 
     def remove_head(self,trace):
-        #print "remove head"
-        #print "old trace:", trace
         end_index = len(trace)/3
         trace = trace[end_index:]
-        #print "new trace:", trace
         return trace
 
     def remove_body(self,trace):
-        #print "remove body"
-        #print "old trace:", trace
         start_index = len(trace)/3
         end_index = (2*len(trace))/3
         trace = trace[:start_index] + trace[end_index:]
-        #print "new trace:", trace
         return trace
 
     def remove_tail(self,trace):
-        #print "remove tail"
-        #print "old trace:", trace
         start_index = (2*len(trace))/3
         trace = trace[:start_index]
-        #print "new trace:", trace
         return trace
 
     def add_noise(self,noise_prob, traces):
@@ -94,23 +85,23 @@ class NoiseGenerator():
             if x < noise_prob:
                 self.no_noisy_traces += 1
                 #to implement a mix all noise, randomly choose a noise type
-                noise_type = random.choice(["swap","remove","head","body","tail"])
+                noise_type = random.choice(["swap","duplicate","head","body","tail"])
                 if noise_type == "swap":
                     trace, added = self.swap_tasks(trace)
                     if added == True:
                         new_traces.append(trace)
                     else:
-                        noise_type = random.choice(["remove","head","body","tail"])
-                        if noise_type == "remove":
-                            new_traces.append(self.remove_task(trace))
+                        noise_type = random.choice(["duplicate","head","body","tail"])
+                        if noise_type == "duplicate":
+                            new_traces.append(self.duplicate_task(trace))
                         elif noise_type == "head":
                             new_traces.append(self.remove_head(trace))
                         elif noise_type == "body":
                             new_traces.append(self.remove_body(trace))
                         elif noise_type == "tail":
                             new_traces.append(self.remove_tail(trace))
-                elif noise_type == "remove":
-                    new_traces.append(self.remove_task(trace))
+                elif noise_type == "duplicate":
+                    new_traces.append(self.duplicate_task(trace))
                 elif noise_type == "head":
                     new_traces.append(self.remove_head(trace))
                 elif noise_type == "body":
