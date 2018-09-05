@@ -604,16 +604,19 @@ def _describe_frame(frame):
                                                       line.strip())
 
 class Zombie(Event):
-            
+
     def __init__(self, env):
         super(Zombie, self).__init__(env)
+        self.once_executed = False
+        self.last_chosen = True
         #self._backup_callbacks = []
-    
+
     def reset(self):
         #self.callbacks = self._backup_callbacks
         #self._backup_callbacks = []
-        self.callbacks = []        
+        self.callbacks = []
         self._value = PENDING
+        self.once_executed = True
         try:
             del self.ok
         except:

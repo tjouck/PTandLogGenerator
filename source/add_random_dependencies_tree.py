@@ -2,6 +2,8 @@
 """
 Created on Mon Aug 08 10:51:41 2016
 
+DEPRECATED
+
 New version of class Lt_dependency. It enables to insert random
 dependencies among choices in the tree for which the precedence
 relation < holds. The comments in the class definition highlight
@@ -13,6 +15,9 @@ input:
 output:
     -unfolded form of process tree with lt-dependencies in newick format
 @author: Toon Jouck
+
+DEPRECATED
+
 """
 
 from ete2 import Tree
