@@ -73,4 +73,18 @@ Log simulator
     -h, --help :          show this help message and exit  
     --i [input_folder] : specify the relative address to the trees folder, default=../data/trees/  
     --t [timestamps] :   indicate whether to include timestamps or not, default=False  
-    --f [format] : indicate which format to use for the log: xes or csv, default=xes  
+    --f [format] : indicate which format to use for the log: xes or csv, default=xes
+    
+DataExtend
+----------
+
+  * Input:
+    * a sample of process trees (default folder: ../data/trees/)
+    * a target determinism level
+    * a maximum number of input nodes (of each decision)
+    * a maximum number of intervals (to discretize numerical value)
+    * a number of cases to generate in each log
+    
+  *Output: a sample of event logs with case attributes
+  
+  *Usage: run the generate_data_trees_and_logs.py and adapt the parameters
