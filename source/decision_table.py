@@ -150,7 +150,7 @@ class DecisionTable():
             table.append(table_row)
             index += 1
         if latex is None:
-            rule_file = open("../data/trees/tree_1_" + str(tree_index) + "_rules_" + choice_labels[d.id] + ".txt","w")
+            rule_file = open("../data/trees/tree" + str(tree_index) + "_rules_" + choice_labels[d.id] + ".txt","w")
             rule_file.write((tab.tabulate(table, headers, tablefmt='grid')))
         elif latex == True:
             print(tab.tabulate(table, headers, tablefmt='latex_booktabs'))

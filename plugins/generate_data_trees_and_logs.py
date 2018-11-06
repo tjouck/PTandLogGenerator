@@ -1,7 +1,9 @@
 import sys
 sys.path.insert(0, '../')
+sys.path.insert(0, '../source')
 sys.path.insert(0, '../newick/')
 import glob
+import argparse
 from tree import TreeNode
 from tree_with_data_dependencies import TreeWithDataDependencies
 from simulate_tree_with_rules import LogSimulator as LogSimulatorData
@@ -50,14 +52,46 @@ def write_as_xes_cf(traces, index):
     xes_file.write(xmltree.tostring(root))
     xes_file.close()
 
-# specify the folder with the trees
-tree_files = glob.glob("../data/trees/*.nw")
+def write_decision_tables(tree_w_data, index):
+    '''write final decision tables of each decision with dependencies'''
+    print index
+    for d in tree_w_data.D:
+        tree_w_data.Delta[d].print_decision_table(tree_w_data.choice_labels, d, tree_w_data.tree_index)
+        print 'determinism:', str(tree_w_data._calculate_determinism_decision_table(tree_w_data.Delta[d]))
+    print 'overall determinism level:', str(tree_w_data.calculate_mean_determinism_level())
 
-# specify parameters
-target_determinism_level = 0.5
-max_input_nodes = 3
-max_cutoff_values = 3
-number_of_cases = 1000
+parser = argparse.ArgumentParser(description='Generate data dependencies and simulate event logs from process trees.')
+parser.add_argument('--i', nargs='?', default='../data/trees/',
+                    help='specify the relative address to the trees folder' \
+                    ', default=../data/trees/', metavar='input_folder')
+parser.add_argument('--p', nargs='?', default=False, type=bool,
+                    help='print decision tables in separate files, '\
+                    'default=False', metavar='print_decision_tables', choices=[False,True])
+parser.add_argument('size', type=int, help='number of cases to simulate')
+parser.add_argument('noise_size', type=int, help='number of noisy cases to simulate')
+parser.add_argument('nodes', type=int, help='maximum input variables of each decision')
+parser.add_argument('cutoff', type=int, help='maximum cutoff values for numerical variable')
+parser.add_argument('determinism', type=float, help='target determinism level')
+
+args = parser.parse_args()
+
+if args.determinism < 0.0 or args.determinism > 1.0:
+    print "ERROR: specify target determinism level in range [0,1]"
+    sys.exit()
+
+print "start of plugin with arguments: ", args
+
+#read the input parameters
+number_of_cases = args.size
+no_noisy_cases = args.noise_size
+target_determinism_level = args.determinism
+max_input_nodes = args.nodes
+max_cutoff_values = args.cutoff
+tree_folder = args.i
+print_decision_tables = args.p
+
+#specify the folder with the trees
+tree_files = glob.glob(tree_folder + "*.nw")
 
 # for each tree
 for filepath in tree_files:
@@ -75,13 +109,19 @@ for filepath in tree_files:
         dl = ''
     else:
         tree_w_data.extend_tree_with_data_dependencies(max_input_nodes, max_cutoff_values)
+        # write decision tables
+        if args.p:
+            write_decision_tables(tree_w_data,i)
         # simulate tree with data dependencies
+        # all cases are fitting to the tree with data dependencies
         simulator = LogSimulatorData(tree_w_data.t,
                                      tree_w_data.input_choice_dictionary,
                                      tree_w_data.rules_simulation,
                                      tree_w_data.case_attr,
                                      False)
         simulator.simulate(number_of_cases)
+        # simulate noisy cases based on removed rules
+        simulator.simulate_noise(number_of_cases, no_noisy_cases, tree_w_data.removed_rules_simulation)
         # write the simulated log to a xes file
         write_as_xes(simulator.log.cases, i)
         # write determinism level

@@ -10,12 +10,12 @@ INPUT:
     set of newick trees
     number of cases
 
-OUTPUT:
+OUTPUT:import argparse
     logs in csv-file format
 
 """
 
-import argparse
+
 import glob
 import sys
 sys.path.insert(0, '../newick/')
