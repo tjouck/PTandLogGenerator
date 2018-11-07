@@ -20,7 +20,9 @@ DEPRECATED
 
 """
 
-from ete2 import Tree
+import sys
+sys.path.insert(0, '../newick')
+from tree import TreeNode
 import itertools
 import random
 import uuid
